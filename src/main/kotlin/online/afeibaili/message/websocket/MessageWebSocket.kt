@@ -33,6 +33,7 @@ class MessageWebSocket : WebSocket {
 
     @OnMessage
     override fun onMessage(session: Session, message: String) {
+        logger.info("收到了一条消息：${message}")
         parsingMessage(session, message)
     }
 

@@ -1,7 +1,7 @@
 package online.afeibaili.message
 
-import online.afeibaili.message.websocket.pojo.MessageSession
-import online.afeibaili.message.websocket.util.json
+import online.afeibaili.message.model.entity.MessageSession
+import online.afeibaili.message.websocket.util.JSON
 
 object MessageManger {
 
@@ -10,7 +10,7 @@ object MessageManger {
      */
 
     fun parsing(message: String) = runCatching {
-        val value: MessageSession = json.readValue(message, MessageSession::class.java)
+        val value: MessageSession = JSON.readValue(message, MessageSession::class.java)
         value
     }
 }

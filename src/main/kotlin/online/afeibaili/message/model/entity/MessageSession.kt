@@ -1,4 +1,4 @@
-package online.afeibaili.message.websocket.pojo
+package online.afeibaili.message.model.entity
 
 
 /**

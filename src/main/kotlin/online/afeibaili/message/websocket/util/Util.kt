@@ -5,7 +5,8 @@ import jakarta.websocket.Session
 import online.afeibaili.message.ChannelManager
 import online.afeibaili.message.MessageManger
 import online.afeibaili.message.SessionManager
-import online.afeibaili.message.websocket.pojo.MessageSession
+import online.afeibaili.message.model.entity.MessageSession
+import online.afeibaili.message.model.entity.PrintInfo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
@@ -22,7 +23,7 @@ import java.util.zip.GZIPOutputStream
  *@version 2025/7/8 18:03
  */
 
-val json: JsonMapper = JsonMapper()
+val JSON: JsonMapper = JsonMapper()
 
 val logger: Logger = LoggerFactory.getLogger("Channel")
 
@@ -31,6 +32,9 @@ enum class ParsingMessageResult() {
     FAILED
 }
 
+/**
+ * 校验消息的准确性，如果正确将发送信息
+ */
 fun parsingMessage(session: Session, message: String, isBinary: Boolean = false): ParsingMessageResult {
     val messageSession: MessageSession = MessageManger.parsing(message).onFailure { exception ->
         SessionManager.disconnect(
@@ -55,6 +59,7 @@ fun parsingMessage(session: Session, message: String, isBinary: Boolean = false)
         }
         it.set.add(session)
         SessionManager.allMap.put(session, messageSession.name)
+        //发送模块、如果是二进制就进行压缩
         if (isBinary) ChannelManager.sendChannelAllByBinary(session, messageSession.name, gzip(messageSession.message))
         else ChannelManager.sendChannelAll(session, messageSession.name, messageSession.message)
         logger.info(messageSession.toString())
@@ -65,15 +70,13 @@ fun parsingMessage(session: Session, message: String, isBinary: Boolean = false)
     return ParsingMessageResult.FAILED
 }
 
-fun printInfo() {
-    logger.info("当前的频道数量：${ChannelManager.map.size}")
-    logger.info("全部人数：${SessionManager.allMap}")
-    logger.info(
-        "频道人数：${
-            ChannelManager.map.values.joinToString(" | ") { it ->
-                " ${it.name}：${it.set.size} "
-            }
-        }")
+fun printInfo(): PrintInfo {
+    return PrintInfo(
+        ChannelManager.map.size,
+        ChannelManager.map.keys.toTypedArray(),
+        SessionManager.allMap.size,
+        ChannelManager.map.map { (name, set) -> "$name=$set" }.toTypedArray()
+    )
 }
 
 fun ungzip(byte: ByteBuffer): String {

@@ -1,7 +1,10 @@
 package online.afeibaili.message.controller
 
 import online.afeibaili.message.ChannelManager
-import online.afeibaili.message.websocket.pojo.ChannelTable
+import online.afeibaili.message.model.entity.ChannelTable
+import online.afeibaili.message.model.entity.PrintInfo
+import online.afeibaili.message.websocket.util.JSON
+import online.afeibaili.message.websocket.util.printInfo
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -24,7 +27,12 @@ class ChannelController {
     @GetMapping("/get")
     fun createChannel(@RequestParam name: String): String {
         val uuid: String = UUID.randomUUID().toString()
-
         return ChannelManager.getOrCreateChannel(ChannelTable(uuid, name, HashSet()))
+    }
+
+    @GetMapping("/info")
+    fun getAllInfo(): String {
+        val info: PrintInfo = printInfo()
+        return JSON.writeValueAsString(info)
     }
 }
