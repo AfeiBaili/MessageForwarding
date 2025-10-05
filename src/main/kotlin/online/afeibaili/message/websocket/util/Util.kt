@@ -3,6 +3,7 @@ package online.afeibaili.message.websocket.util
 import com.fasterxml.jackson.databind.json.JsonMapper
 import jakarta.websocket.Session
 import online.afeibaili.message.ChannelManager
+import online.afeibaili.message.Configs
 import online.afeibaili.message.MessageManger
 import online.afeibaili.message.SessionManager
 import online.afeibaili.message.model.entity.MessageSession
@@ -57,6 +58,9 @@ fun parsingMessage(session: Session, message: String, isBinary: Boolean = false)
             )
             return ParsingMessageResult.FAILED
         }
+        ChannelManager.map[messageSession.name]?.history?.add(messageSession.message)
+        ChannelManager.sendHistory(session, messageSession.name)
+
         it.set.add(session)
         SessionManager.allMap.put(session, messageSession.name)
         //发送模块、如果是二进制就进行压缩
@@ -69,6 +73,7 @@ fun parsingMessage(session: Session, message: String, isBinary: Boolean = false)
     SessionManager.disconnect(session, "没有所谓的频道，请使用\"/channel/get?name=频道名\"创建")
     return ParsingMessageResult.FAILED
 }
+
 
 fun printInfo(): PrintInfo {
     return PrintInfo(

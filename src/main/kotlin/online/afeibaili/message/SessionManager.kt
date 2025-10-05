@@ -22,6 +22,7 @@ object SessionManager {
     fun removeSession(session: Session) {
         allMap.remove(session)?.let {
             ChannelManager.map[it]!!.set.remove(session)
+            ChannelManager.clearHistoryBySession(it)
         }
     }
 }

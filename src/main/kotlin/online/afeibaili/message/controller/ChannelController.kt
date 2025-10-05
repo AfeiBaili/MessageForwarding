@@ -23,11 +23,10 @@ class ChannelController {
     /**
      * 通过名字来创建或获取一个UUID，用于发信息时传入UUID以验证
      */
-
     @GetMapping("/get")
     fun createChannel(@RequestParam name: String): String {
         val uuid: String = UUID.randomUUID().toString()
-        return ChannelManager.getOrCreateChannel(ChannelTable(uuid, name, HashSet()))
+        return ChannelManager.getOrCreateChannel(ChannelTable(uuid, name, HashSet(), mutableListOf()))
     }
 
     @GetMapping("/info")

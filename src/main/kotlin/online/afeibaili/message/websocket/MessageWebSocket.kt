@@ -2,6 +2,7 @@ package online.afeibaili.message.websocket
 
 import jakarta.websocket.*
 import jakarta.websocket.server.ServerEndpoint
+import online.afeibaili.message.ChannelManager
 import online.afeibaili.message.SessionManager
 import online.afeibaili.message.websocket.util.logger
 import online.afeibaili.message.websocket.util.parsingMessage

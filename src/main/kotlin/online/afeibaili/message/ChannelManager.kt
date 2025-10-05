@@ -2,7 +2,9 @@ package online.afeibaili.message
 
 import jakarta.websocket.Session
 import online.afeibaili.message.model.entity.ChannelTable
+import online.afeibaili.message.websocket.util.logger
 import java.nio.ByteBuffer
+import kotlin.math.log
 
 /**
  * 用来管理频道
@@ -31,6 +33,7 @@ object ChannelManager {
             else removedSet.add(it)
         }
         map[name]!!.set.removeAll(removedSet)
+        if (isEmpty(name)) clearHistory(name)
     }
 
     /**
@@ -44,5 +47,36 @@ object ChannelManager {
             else removedSet.add(it)
         }
         map[name]!!.set.removeAll(removedSet)
+        if (isEmpty(name)) clearHistory(name)
+    }
+
+    fun sendSingleSession(session: Session, message: String) {
+        session.basicRemote.sendText(message)
+    }
+
+    fun sendHistory(session: Session, name: String) {
+        if (!Configs.history) return
+        map[name]?.let { it ->
+            if (!it.set.contains(session)) {
+                map[name]?.history?.forEach { message ->
+                    sendSingleSession(session, message)
+                }
+            }
+        }
+    }
+
+    fun isEmpty(name: String): Boolean {
+        return map[name]!!.set.isEmpty()
+    }
+
+    fun clearHistory(name: String) {
+        map[name]!!.history.clear()
+    }
+
+    fun clearHistoryBySession(name: String) {
+        if (isEmpty(name)) {
+            clearHistory(name)
+            logger.info("已清空${name}历史记录}")
+        }
     }
 }
