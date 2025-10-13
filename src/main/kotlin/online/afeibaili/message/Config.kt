@@ -9,7 +9,12 @@ private val map = mutableMapOf<String, (String) -> Unit>(
             Configs.history = bool
             logger.info("历史记录状态：${value}")
         }
-    })
+    },
+    "--command-prefix" to { value ->
+        Configs.commandPrefix = value
+        logger.info("设置命令前缀：${value}")
+    }
+)
 
 fun passingArgs(array: Array<String>) {
     array.forEach { config ->
@@ -27,4 +32,5 @@ fun passingArgs(array: Array<String>) {
 
 object Configs {
     var history: Boolean = false
+    var commandPrefix: String = "/"
 }

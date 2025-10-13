@@ -34,4 +34,10 @@ class ChannelController {
         val info: PrintInfo = printInfo()
         return JSON.writeValueAsString(info)
     }
+
+    @GetMapping("/session/all")
+    fun getSessionNumber(): String {
+        val size = printInfo().sessionAll
+        return JSON.writeValueAsString("当前在线人数为：$size")
+    }
 }

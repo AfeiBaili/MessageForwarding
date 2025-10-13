@@ -6,6 +6,7 @@ import online.afeibaili.message.ChannelManager
 import online.afeibaili.message.Configs
 import online.afeibaili.message.MessageManger
 import online.afeibaili.message.SessionManager
+import online.afeibaili.message.model.entity.ChannelTable
 import online.afeibaili.message.model.entity.MessageSession
 import online.afeibaili.message.model.entity.PrintInfo
 import org.slf4j.Logger
@@ -15,7 +16,6 @@ import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
-
 
 /**
  * 一些工具方法和属性
@@ -32,6 +32,8 @@ enum class ParsingMessageResult() {
     SUCCESS,
     FAILED
 }
+
+val commandParser = CommandParser()
 
 /**
  * 校验消息的准确性，如果正确将发送信息
@@ -58,6 +60,11 @@ fun parsingMessage(session: Session, message: String, isBinary: Boolean = false)
             )
             return ParsingMessageResult.FAILED
         }
+
+        if (parsingCommand(messageSession, it)) {
+            return ParsingMessageResult.SUCCESS
+        }
+
         ChannelManager.map[messageSession.name]?.history?.add(messageSession.message)
         ChannelManager.sendHistory(session, messageSession.name)
 
@@ -72,6 +79,14 @@ fun parsingMessage(session: Session, message: String, isBinary: Boolean = false)
 
     SessionManager.disconnect(session, "没有所谓的频道，请使用\"/channel/get?name=频道名\"创建")
     return ParsingMessageResult.FAILED
+}
+
+fun parsingCommand(messageSession: MessageSession, channel: ChannelTable): Boolean {
+    if (messageSession.message.startsWith(Configs.commandPrefix)) {
+        commandParser.process(messageSession.message, channel)
+        return true
+    }
+    return false
 }
 
 
