@@ -81,8 +81,9 @@ fun parsingMessage(session: Session, message: String, isBinary: Boolean = false)
 }
 
 fun parsingCommand(messageSession: MessageSession, channel: ChannelTable): Boolean {
-    if (messageSession.message.startsWith(Configs.commandPrefix)) {
-        commandParser.process(messageSession.message, channel)
+    val message: String = messageSession.message.removePrefix("\"").removeSuffix("\"")
+    if (message.startsWith(Configs.commandPrefix)) {
+        commandParser.process(message, channel)
         return true
     }
     return false
