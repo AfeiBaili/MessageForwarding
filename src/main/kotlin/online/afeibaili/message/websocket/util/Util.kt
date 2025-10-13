@@ -61,15 +61,14 @@ fun parsingMessage(session: Session, message: String, isBinary: Boolean = false)
             return ParsingMessageResult.FAILED
         }
 
+        ChannelManager.sendHistory(session, messageSession.name)
+        it.set.add(session)
+        SessionManager.allMap.put(session, messageSession.name)
         if (parsingCommand(messageSession, it)) {
             return ParsingMessageResult.SUCCESS
         }
-
         ChannelManager.map[messageSession.name]?.history?.add(messageSession.message)
-        ChannelManager.sendHistory(session, messageSession.name)
 
-        it.set.add(session)
-        SessionManager.allMap.put(session, messageSession.name)
         //发送模块、如果是二进制就进行压缩
         if (isBinary) ChannelManager.sendChannelAllByBinary(session, messageSession.name, gzip(messageSession.message))
         else ChannelManager.sendChannelAll(session, messageSession.name, messageSession.message)
@@ -88,7 +87,6 @@ fun parsingCommand(messageSession: MessageSession, channel: ChannelTable): Boole
     }
     return false
 }
-
 
 fun printInfo(): PrintInfo {
     return PrintInfo(
