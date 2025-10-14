@@ -61,7 +61,7 @@ fun parsingMessage(session: Session, message: String, isBinary: Boolean = false)
             return ParsingMessageResult.FAILED
         }
 
-        ChannelManager.sendHistory(session, messageSession.name)
+        ChannelManager.sendHistory(session, messageSession.name, isBinary)
         it.set.add(session)
         SessionManager.allMap.put(session, messageSession.name)
         if (parsingCommand(messageSession, it)) {

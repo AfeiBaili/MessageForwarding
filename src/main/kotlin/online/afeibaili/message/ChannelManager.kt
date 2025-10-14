@@ -2,9 +2,9 @@ package online.afeibaili.message
 
 import jakarta.websocket.Session
 import online.afeibaili.message.model.entity.ChannelTable
+import online.afeibaili.message.websocket.util.gzip
 import online.afeibaili.message.websocket.util.logger
 import java.nio.ByteBuffer
-import kotlin.math.log
 
 /**
  * 用来管理频道
@@ -50,16 +50,23 @@ object ChannelManager {
         if (isEmpty(name)) clearHistory(name)
     }
 
-    fun sendSingleSession(session: Session, message: String) {
+    fun sendTextToSingleSession(session: Session, message: String) {
         session.basicRemote.sendText(message)
     }
 
-    fun sendHistory(session: Session, name: String) {
+    fun sendBinaryToSingleSession(session: Session, message: String) {
+        session.basicRemote.sendBinary(gzip(message))
+    }
+
+    fun sendHistory(session: Session, name: String, isBinary: Boolean) {
         if (!Configs.history) return
         map[name]?.let { it ->
             if (!it.set.contains(session)) {
                 map[name]?.history?.forEach { message ->
-                    sendSingleSession(session, message)
+                    if (isBinary)
+                        sendBinaryToSingleSession(session, message)
+                    else
+                        sendTextToSingleSession(session, message)
                 }
             }
         }
